@@ -22,7 +22,7 @@ def send_email( mfrom, mto, msg):
 ## Constants
 APP_NAME = " HelloWorld of Big Data"
 ##OTHER FUNCTIONS/CLASSES
-mongo_url = 'mongodb+srv://unique:unique@cluster0.3cmqe.mongodb.net/?retryWrites=true&w=majority'
+mongo_url = 'mongodb://unique:unique@cluster0.3cmqe.mongodb.net/'
 def main(sc, db_dot_collection):
     mfrom = 'myself@whatever.com'
     #textRDD = sc.textFile(filename)
@@ -32,15 +32,14 @@ def main(sc, db_dot_collection):
     #    print wc[0],wc[1]
     msg = "hello"
     pymongo_spark.activate()
-    rdd = (sc.mongoRDD('{0}'+db_dot_collection.format(mongo_url))
-        .map(lambda doc: send_email(mfrom, doc.get('email'), msg))
+    rdd = (sc.mongoRDD('{0}{1}'.format(mongo_url,db_dot_collection)).map(lambda doc: send_email(mfrom, doc.get('email'), msg)))
     rdd.collect()
 
 if __name__ == "__main__":
 
    # Configure Spark
-    conf = SparkConf().setAppName(APP_NAME)
-    conf = conf.setMaster("local[*]")
-    sc   = SparkContext(conf=conf)
-    # Execute Main functionality
-    main(sc, 'test.emailsvc')
+   conf = SparkConf().setAppName(APP_NAME)
+   conf = conf.setMaster("local[*]")
+   sc   = SparkContext(conf=conf)
+   # Execute Main functionality
+   main(sc, 'test.emailsvc')
